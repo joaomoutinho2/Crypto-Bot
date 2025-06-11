@@ -1,0 +1,6 @@
+ccxt
+pandas
+streamlit
+openai
+ta
+python-dotenv
