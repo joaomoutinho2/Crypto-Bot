@@ -4,3 +4,6 @@ streamlit
 openai
 ta
 python-dotenv
+joblib
+scikit-learn
+firebase-admin
