@@ -2,26 +2,26 @@ import pandas as pd
 import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import accuracy_score
 from firebase_config import iniciar_firebase
 from firebase_admin import firestore
+from utils.telegram_alert import enviar_telegram
 
-db = iniciar_firebase()
-
-def carregar_dados_posicoes():
+def carregar_dados():
+    db = firestore.client()
     docs = db.collection("posicoes").where("em_aberto", "==", False).stream()
-    registos = []
+    dados = []
     for doc in docs:
         d = doc.to_dict()
-        if "lucro" in d and all(k in d for k in ["rsi", "macd_diff", "preco_entrada"]):
-            registos.append({
+        if "lucro" in d and all(k in d for k in ["rsi", "macd_diff"]):
+            dados.append({
                 "rsi": d["rsi"],
                 "macd_diff": d["macd_diff"],
                 "lucro": 1 if d["lucro"] > 0 else 0
             })
-    return pd.DataFrame(registos)
+    return pd.DataFrame(dados)
 
-def treinar_modelo(df):
+def treinar(df):
     X = df.drop("lucro", axis=1)
     y = df["lucro"]
 
@@ -31,18 +31,18 @@ def treinar_modelo(df):
     modelo.fit(X_train, y_train)
 
     y_pred = modelo.predict(X_test)
-
-    print("✅ Modelo treinado com sucesso.")
-    print("🔎 Accuracy:", accuracy_score(y_test, y_pred))
-    print("📋 Relatório:")
-    print(classification_report(y_test, y_pred))
+    acc = accuracy_score(y_test, y_pred)
 
     joblib.dump(modelo, "modelo_treinado.pkl")
-    print("💾 Modelo guardado como modelo_treinado.pkl")
+
+    enviar_telegram(f"🧠 Modelo re-treinado!\n🎯 Acurácia: *{acc*100:.2f}%* com {len(df)} registos.")
+    print("✅ Modelo treinado e guardado.")
+    return acc
 
 if __name__ == "__main__":
-    df = carregar_dados_posicoes()
+    iniciar_firebase()
+    df = carregar_dados()
     if df.empty:
-        print("⚠️ Sem dados suficientes para treinar o modelo.")
+        print("⚠️ Sem dados para treino.")
     else:
-        treinar_modelo(df)
+        treinar(df)

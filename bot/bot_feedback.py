@@ -1,41 +1,32 @@
 import ccxt
-from firebase_admin import firestore
-from dados.saldo_virtual import carregar_saldo, guardar_saldo
-from datetime import datetime
+import pandas as pd
+from firebase_config import iniciar_firebase
+from dados.gestor_posicoes import carregar_posicoes_abertas, fechar_posicao
+from estrategia.avaliar_saida import avaliar_saida
+from utils.telegram_alert import enviar_telegram
 
+db = iniciar_firebase()
 exchange = ccxt.kucoin()
 
-def avaliar_resultados():
-    db = firestore.client()
-    saldo = carregar_saldo()
+def correr_feedback():
+    posicoes = carregar_posicoes_abertas()
 
-    docs = db.collection("previsoes").order_by("timestamp").stream()
-    for doc in docs:
-        dados = doc.to_dict()
-        if dados.get("avaliado"):
-            continue
-        simbolo = dados['simbolo']
-        decisao = dados['decisao']
-        timestamp = dados['timestamp']
-        if decisao != 'sim':
-            continue
-
+    for pos in posicoes:
+        simbolo = pos["simbolo"]
         try:
-            df = exchange.fetch_ohlcv(simbolo, timeframe='1m', limit=2)
-            preco_atual = df[-1][4]
-            preco_entrada = df[-2][4]
-            lucro = preco_atual / preco_entrada - 1
-            saldo *= (1 + lucro)
+            df = exchange.fetch_ohlcv(simbolo, timeframe="1m", limit=100)
+            df = pd.DataFrame(df, columns=["timestamp", "open", "high", "low", "close", "volume"])
 
-            db.collection("previsoes").document(doc.id).update({
-                "avaliado": True,
-                "lucro": lucro,
-                "preco_entrada": preco_entrada,
-                "preco_saida": preco_atual,
-                "rsi": dados.get("rsi"),
-                "macd_diff": dados.get("macd_diff")
-            })
-        except:
-            continue
+            resultado = avaliar_saida(df)
+            if resultado["acao"] == "sair":
+                preco_saida = df["close"].iloc[-1]
+                lucro = fechar_posicao(pos["id"], preco_saida)
 
-    guardar_saldo(saldo)
+                mensagem = f"📉 *Saída recomendada* em `{simbolo}`\n\n🧠 Motivo: {resultado['motivo']}\n📈 Preço atual: `{preco_saida}`\n💰 Lucro: `{lucro*100:.2f}%`"
+                enviar_telegram(mensagem)
+
+        except Exception as e:
+            print(f"Erro ao verificar {simbolo}: {e}")
+
+if __name__ == "__main__":
+    correr_feedback()

@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import streamlit as st
 from firebase_config import iniciar_firebase
 import pandas as pd
@@ -28,3 +32,6 @@ def mostrar_dashboard():
             "Data": d.get("timestamp")
         })
     st.dataframe(pd.DataFrame(lista))
+
+if __name__ == "__main__":
+    mostrar_dashboard()

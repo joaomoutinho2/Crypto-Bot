@@ -1,7 +1,9 @@
-import openai
 import os
+from dotenv import load_dotenv
+from openai import OpenAI
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def avaliar_com_chatgpt(moeda, contexto):
     prompt = f"""
@@ -12,8 +14,10 @@ def avaliar_com_chatgpt(moeda, contexto):
     Devo entrar agora nesta moeda?
     Responde apenas com: 'sim', 'não' ou 'incerto'. Depois explica brevemente.
     """
-    resposta = openai.ChatCompletion.create(
+
+    resposta = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}]
     )
-    return resposta['choices'][0]['message']['content']
+
+    return resposta.choices[0].message.content
