@@ -1,11 +1,48 @@
 services:
+  # 🧠 Treino do modelo 1x por dia
   - type: worker
     name: treino-modelo
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python treino_continuo.py
-    schedule: "0 3 * * *"  # corre todos os dias às 03:00 UTC
+    startCommand: python treino/treino_continuo.py
+    schedule: "0 3 * * *"
+    envVars:
+      - key: FIREBASE_JSON
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+
+  # 📈 Análise de oportunidades (entrada) — a cada hora
+  - type: worker
+    name: bot-entrada
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot/bot_entrada.py
+    schedule: "0 * * * *"
+    envVars:
+      - key: FIREBASE_JSON
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+
+  # 📉 Fecho automático de posições (feedback) — a cada 15 min
+  - type: worker
+    name: bot-feedback
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot/bot_feedback.py
+    schedule: "*/15 * * * *"
     envVars:
       - key: FIREBASE_JSON
         sync: false
