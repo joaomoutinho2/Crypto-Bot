@@ -9,7 +9,7 @@ tp_percent = 0.06  # Take-profit
 trailing_percent = 0.03
 
 # === 1. Carregar CSV com dados históricos ===
-df = pd.read_csv("historico_BTCUSDT_1min.csv")  # ou outro par
+df = pd.read_csv("BTCUSDT_1min.csv")  # ou outro par
 df['timestamp'] = pd.to_datetime(df['timestamp'])
 df.set_index('timestamp', inplace=True)
 
