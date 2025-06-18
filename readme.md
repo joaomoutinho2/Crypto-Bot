@@ -46,6 +46,15 @@ FIREBASE_JSON={...}  # JSON compactado como string
 pip install -r requirements.txt
 ```
 
+### Gerar ou obter o modelo
+O bot carrega o modelo RandomForest mais recente do Firebase. Caso ainda não
+exista um modelo disponível, podes treinar e enviar um novo executando:
+```bash
+python treino_modelo.py
+```
+O arquivo `modelo_rf.pkl` será criado localmente (e está ignorado pelo Git) e
+enviado para o Firestore, de onde o bot o irá buscar automaticamente.
+
 4. (Opcional) Gere indicadores técnicos com o dataset `BTCUSDT_1min.csv`:
 ```bash
 python analise_tecnica/indicadores.py

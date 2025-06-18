@@ -4,3 +4,4 @@ firebase_key.json
 # Ignore Python cache files
 __pycache__/
 *.pyc
+modelo_rf.pkl
