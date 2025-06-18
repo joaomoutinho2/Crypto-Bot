@@ -1,4 +1,4 @@
-# 📁 programa_investimento/
+# 📁 Crypto-Bot
 # Estrutura organizada e funcional do projeto inteligente com IA, Firebase e KuCoin
 
 # === README.md ===
@@ -14,7 +14,7 @@ Este bot toma decisões de investimento em criptomoedas de forma totalmente auto
 
 ## 🗂️ Estrutura do Projeto
 ```
-programa_investimento/
+Crypto-Bot/
 ├── analise_tecnica/       # RSI, MACD, Bollinger, etc.
 ├── analise_fundamental/   # GPT-4o, scraper de contexto
 ├── cerebro/               # Tomada de decisão e aprendizagem
@@ -31,7 +31,7 @@ programa_investimento/
 ## 🔧 Como Correr Localmente
 1. Clona o projeto:
 ```bash
-git clone https://github.com/teu_repositorio/programa_investimento.git
+git clone https://github.com/teu_repositorio/crypto-bot.git
 cd Crypto-Bot
 ```
 
@@ -50,7 +50,7 @@ pip install -r requirements.txt
 O bot carrega o modelo RandomForest mais recente do Firebase. Caso ainda não
 exista um modelo disponível, podes treinar e enviar um novo executando:
 ```bash
-python treino_modelo.py
+python modelo/treino_modelo.py
 ```
 O arquivo `modelo_rf.pkl` será criado localmente (e está ignorado pelo Git) e
 enviado para o Firestore, de onde o bot o irá buscar automaticamente.

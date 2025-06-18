@@ -5,7 +5,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python treino/treino_continuo.py
+    startCommand: python modelo/treino_continuo.py
     schedule: "0 3 * * *"
     envVars:
       - key: FIREBASE_JSON
