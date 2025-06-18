@@ -21,8 +21,8 @@ def correr_analise():
             df = obter_df_ativo(simbolo)  # Use a função que calcula os indicadores técnicos
 
             # Verificar indicadores técnicos
-            rsi = df['RSI'].iloc[-1]
-            macd_hist = df['MACD_histograma'].iloc[-1]
+            rsi = df['rsi'].iloc[-1]
+            macd_hist = df['macd_diff'].iloc[-1]
             preco = df['close'].iloc[-1]
             bb_lower = df['bb_lower'].iloc[-1]
             volume = df['volume'].iloc[-1]
@@ -43,9 +43,9 @@ def correr_analise():
                 try:
                     resultado = avaliar_entrada(df, simbolo)
 
-                    if isinstance(resultado, str) and "ML:" in resultado and "GPT:" in resultado:
-                        resultado_ml = 1 if "ML: 1" in resultado else 0
-                        decisao_gpt = resultado.split("GPT:")[1].strip().lower()
+                    if isinstance(resultado, dict):
+                        resultado_ml = int(resultado.get("ml", 0))
+                        decisao_gpt = resultado.get("gpt", "nao").lower()
                     else:
                         resultado_ml = 0
                         decisao_gpt = "nao"
