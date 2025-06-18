@@ -5,7 +5,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 import pandas as pd
 import altair as alt
-from firebase_config import db, carregar_saldo
+from firebase_config import db
+from dados.gestor_saldo import carregar_saldo
 from google.cloud import firestore
 
 st.title("💹 Painel de Controlo do Crypto-Bot")
