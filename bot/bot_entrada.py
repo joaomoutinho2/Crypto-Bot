@@ -9,7 +9,7 @@ from utils.telegram_alert import enviar_telegram
 from utils.dados_market import obter_df_ativo
 from dados.gestor_posicoes import registar_entrada
 from dados.gestor_saldo import carregar_saldo, guardar_saldo
-from avaliador_modelo import prever_subida  # Importar função para prever subida
+from cerebro.modelo.avaliador_modelo import prever_subida  # Importar função para prever subida
 
 def correr_analise():
     exchange = ccxt.kucoin()

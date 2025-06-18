@@ -18,10 +18,12 @@ programa_investimento/
 ├── analise_tecnica/       # RSI, MACD, Bollinger, etc.
 ├── analise_fundamental/   # GPT-4o, scraper de contexto
 ├── cerebro/               # Tomada de decisão e aprendizagem
+│   └── modelo/            # Treino e avaliação de ML
 ├── dados/                 # Firestore + modelos + saldo
 ├── bot/                   # Entrada de sinais e feedback de lucro
 ├── painel/                # Streamlit com saldo e decisões
 ├── utils/                 # Helpers e formatação
+├── scripts/               # Ferramentas e agendadores
 ├── firebase_config.py     # Inicia Firebase
 ├── main.py                # Ponto de entrada do bot
 ├── requirements.txt       # Bibliotecas
@@ -50,7 +52,7 @@ pip install -r requirements.txt
 O bot carrega o modelo RandomForest mais recente do Firebase. Caso ainda não
 exista um modelo disponível, podes treinar e enviar um novo executando:
 ```bash
-python treino_modelo.py
+python cerebro/modelo/treino_modelo.py
 ```
 O arquivo `modelo_rf.pkl` será criado localmente (e está ignorado pelo Git) e
 enviado para o Firestore, de onde o bot o irá buscar automaticamente.
@@ -65,7 +67,12 @@ python analise_tecnica/indicadores.py
 python main.py
 ```
 
-6. Para ver o painel:
+6. (Opcional) Para executar em modo contínuo:
+```bash
+python scripts/loop_bot.py
+```
+
+7. Para ver o painel:
 ```bash
 streamlit run painel/painel.py
 ```
