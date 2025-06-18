@@ -12,6 +12,14 @@ from dados.gestor_saldo import carregar_saldo, guardar_saldo
 from modelo.avaliador_modelo import prever_subida  # Importar função para prever subida
 
 def correr_analise():
+    """Percorre os principais mercados avaliando possíveis entradas.
+
+    Para cada par USDT da KuCoin são obtidos os dados de mercado e
+    calculados os indicadores técnicos. Em seguida o modelo de Machine
+    Learning e o GPT decidem se a posição deve ser aberta. Quando todos
+    os critérios positivos se alinham, a função registra a entrada e
+    atualiza o saldo virtual.
+    """
     exchange = ccxt.kucoin()
     simbolos = [s for s in exchange.load_markets().keys() if "/USDT" in s]
     saldo_virtual = carregar_saldo()
