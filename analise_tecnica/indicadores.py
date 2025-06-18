@@ -1,8 +1,8 @@
 import pandas as pd
 import ta
 
-# Carregar CSV limpo
-df = pd.read_csv("BTCUSDT_1min_limpo.csv")
+# Carregar o histórico de preços
+df = pd.read_csv("BTCUSDT_1min.csv")
 df['timestamp'] = pd.to_datetime(df['timestamp'])
 
 # === CALCULAR INDICADORES ===

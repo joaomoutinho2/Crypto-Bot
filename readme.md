@@ -46,12 +46,17 @@ FIREBASE_JSON={...}  # JSON compactado como string
 pip install -r requirements.txt
 ```
 
-4. Corre o bot principal:
+4. (Opcional) Gere indicadores técnicos com o dataset `BTCUSDT_1min.csv`:
+```bash
+python analise_tecnica/indicadores.py
+```
+
+5. Corre o bot principal:
 ```bash
 python main.py
 ```
 
-5. Para ver o painel:
+6. Para ver o painel:
 ```bash
 streamlit run painel/painel.py
 ```
