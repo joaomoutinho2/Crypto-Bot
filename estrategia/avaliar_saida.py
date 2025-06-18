@@ -37,8 +37,8 @@ def avaliar_saida():
 
         # 🔁 Condição técnica de saída
         else:
-            rsi = df['RSI'].iloc[-1]
-            macd = df['MACD_histograma'].iloc[-1]
+            rsi = df['rsi'].iloc[-1]
+            macd = df['macd_diff'].iloc[-1]
             preco = df['close'].iloc[-1]
             bb_upper = df['bb_upper'].iloc[-1]
             volume = df['volume'].iloc[-1]

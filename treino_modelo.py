@@ -9,8 +9,14 @@ from datetime import datetime
 
 # === Carrega dados
 df = pd.read_csv("dados_treinamento.csv")
+df = df.rename(columns={
+    'RSI': 'rsi',
+    'MACD': 'macd',
+    'MACD_signal': 'macd_signal',
+    'MACD_histograma': 'macd_diff'
+})
 features = [
-    'RSI', 'MACD_histograma',
+    'rsi', 'macd_diff',
     'bb_lower', 'bb_upper', 'bb_middle',
     'volume', 'volume_ma', 'close'
 ]

@@ -27,7 +27,7 @@ def prever_subida(df_indicadores):
 
     # Garantir que os dados estão no mesmo formato do treino
     features = [
-        'RSI', 'MACD_histograma',
+        'rsi', 'macd_diff',
         'bb_lower', 'bb_upper', 'bb_middle',
         'volume', 'volume_ma', 'close'
     ]

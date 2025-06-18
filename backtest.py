@@ -14,9 +14,9 @@ df['timestamp'] = pd.to_datetime(df['timestamp'])
 df.set_index('timestamp', inplace=True)
 
 # === 2. Calcular indicadores ===
-df['RSI'] = ta.momentum.RSIIndicator(df['close'], window=14).rsi()
+df['rsi'] = ta.momentum.RSIIndicator(df['close'], window=14).rsi()
 macd = ta.trend.MACD(df['close'])
-df['MACD_histograma'] = macd.macd_diff()
+df['macd_diff'] = macd.macd_diff()
 bb = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
 df['bb_lower'] = bb.bollinger_lband()
 df['bb_upper'] = bb.bollinger_hband()
@@ -33,8 +33,8 @@ for i in range(20, len(df)):  # começa após 20 para evitar NaN dos indicadores
     if posicao is None:
         # Verifica condições de entrada
         if (
-            linha['RSI'] < 30 and
-            linha['MACD_histograma'] > 0 and
+            linha['rsi'] < 30 and
+            linha['macd_diff'] > 0 and
             linha['close'] < linha['bb_lower'] and
             linha['volume'] > linha['volume_ma']
         ):
