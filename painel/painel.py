@@ -3,35 +3,72 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import streamlit as st
-from firebase_config import iniciar_firebase
 import pandas as pd
+import altair as alt
+from firebase_config import db, carregar_saldo
+from google.cloud import firestore
 
-iniciar_firebase()
+st.title("💹 Painel de Controlo do Crypto-Bot")
 
-import firebase_admin
-from firebase_admin import firestore
-from dados.saldo_virtual import carregar_saldo
+# Saldo
+saldo = carregar_saldo()
+st.metric("Saldo Virtual", f"{saldo:.2f} USDT")
 
-def mostrar_dashboard():
-    st.title("📈 Painel de Inteligência de Investimento")
-    st.metric("💰 Saldo Virtual", f"${carregar_saldo():.2f}")
+# Carregar posições
+docs = db.collection("posicoes").order_by("timestamp_entrada", direction=firestore.Query.DESCENDING).stream()
 
-    st.write("Entradas e decisões da IA:")
-    db = firestore.client()
-    docs = db.collection("previsoes").order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
-    lista = []
-    for doc in docs:
-        d = doc.to_dict()
-        lista.append({
-            "Moeda": d.get("simbolo"),
-            "Decisão": d.get("decisao"),
-            "Contexto": d.get("contexto"),
-            "Entrada": d.get("preco_entrada"),
-            "Saída": d.get("preco_saida"),
-            "Lucro": f"{d.get('lucro', 0)*100:.2f}%" if "lucro" in d else None,
-            "Data": d.get("timestamp")
-        })
-    st.dataframe(pd.DataFrame(lista))
+dados = []
+for doc in docs:
+    d = doc.to_dict()
+    dados.append({
+        "Moeda": d.get("simbolo"),
+        "Entrada": d.get("preco_entrada"),
+        "Saída": d.get("preco_saida", None),
+        "Montante": d.get("montante", None),
+        "Lucro (USDT)": d.get("lucro_valor", None),
+        "Lucro (%)": d.get("lucro_percentual", None),
+        "Aberta?": d.get("em_aberto", True),
+        "GPT": d.get("decisao"),
+        "Data": d.get("timestamp_entrada"),
+    })
 
-if __name__ == "__main__":
-    mostrar_dashboard()
+df = pd.DataFrame(dados)
+
+# Separar por estado
+df_abertas = df[df["Aberta?"] == True]
+df_fechadas = df[df["Aberta?"] == False]
+
+st.subheader("📊 Posições em Aberto")
+st.dataframe(df_abertas.style.format({
+    "Entrada": "{:.4f}",
+    "Montante": "{:.2f}"
+}))
+
+st.subheader("✅ Posições Fechadas")
+st.dataframe(df_fechadas.style.format({
+    "Entrada": "{:.4f}",
+    "Saída": "{:.4f}",
+    "Montante": "{:.2f}",
+    "Lucro (USDT)": "{:.2f}",
+    "Lucro (%)": "{:.2f}"
+}))
+
+# Gráfico de saldo ao longo do tempo
+docs_saldo = db.collection("historico_saldo").order_by("data").stream()
+dados_grafico = []
+
+for doc in docs_saldo:
+    d = doc.to_dict()
+    dados_grafico.append({
+        "Data": d.get("data"),
+        "Saldo (USDT)": d.get("saldo")
+    })
+
+if dados_grafico:
+    df_saldo = pd.DataFrame(dados_grafico)
+    st.subheader("📈 Evolução do Saldo Virtual")
+    chart = alt.Chart(df_saldo).mark_line().encode(
+        x="Data:T",
+        y="Saldo (USDT):Q"
+    ).properties(width=700, height=300)
+    st.altair_chart(chart, use_container_width=True)

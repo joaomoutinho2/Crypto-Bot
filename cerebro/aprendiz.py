@@ -3,10 +3,7 @@ import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
-from firebase_config import iniciar_firebase
-from firebase_admin import firestore
-
-db = iniciar_firebase()
+from firebase_config import db
 
 def carregar_dados_posicoes():
     docs = db.collection("posicoes").where("em_aberto", "==", False).stream()

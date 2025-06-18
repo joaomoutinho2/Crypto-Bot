@@ -7,12 +7,10 @@ import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from firebase_config import iniciar_firebase
-from firebase_admin import firestore
+from firebase_config import db
 from utils.telegram_alert import enviar_telegram
 
 def carregar_dados():
-    db = firestore.client()
     docs = db.collection("posicoes").where("em_aberto", "==", False).stream()
     dados = []
     for doc in docs:
@@ -44,7 +42,6 @@ def treinar(df):
     return acc
 
 if __name__ == "__main__":
-    iniciar_firebase()
     df = carregar_dados()
     if df.empty:
         print("⚠️ Sem dados para treino.")

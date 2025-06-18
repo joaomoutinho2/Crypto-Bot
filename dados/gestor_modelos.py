@@ -1,12 +1,12 @@
-from firebase_admin import firestore
+from firebase_config import db
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import joblib
 import base64
 import io
+from google.cloud import firestore
 
 def treinar_modelo():
-    db = firestore.client()
     docs = db.collection("previsoes").where("avaliado", "==", True).stream()
     dados = []
     for doc in docs:
