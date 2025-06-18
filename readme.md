@@ -32,7 +32,7 @@ programa_investimento/
 1. Clona o projeto:
 ```bash
 git clone https://github.com/teu_repositorio/programa_investimento.git
-cd Crypto_bot
+cd Crypto-Bot
 ```
 
 2. Cria o `.env`:
