@@ -1,5 +1,5 @@
 from firebase_admin import firestore
-from funcoes import get_historico_1min
+from utils.dados_market import obter_df_ativo as get_historico_1min
 from datetime import datetime
 
 db = firestore.client()
