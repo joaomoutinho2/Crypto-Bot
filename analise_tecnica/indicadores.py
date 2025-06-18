@@ -1,23 +1,34 @@
-def calcular_indicadores(df):
-    from ta.momentum import RSIIndicator
-    from ta.trend import EMAIndicator, MACD
-    from ta.volatility import BollingerBands
+import pandas as pd
+import ta
 
-    if len(df) < 50:
-        raise ValueError("O DataFrame precisa de pelo menos 50 valores para calcular indicadores.")
+# Carregar CSV limpo
+df = pd.read_csv("BTCUSDT_1min_limpo.csv")
+df['timestamp'] = pd.to_datetime(df['timestamp'])
 
-    df = df.copy()  # evita SettingWithCopyWarning
+# === CALCULAR INDICADORES ===
 
-    df['rsi'] = RSIIndicator(df['close']).rsi()
-    df['ema_diff'] = EMAIndicator(df['close'], 12).ema_indicator() - EMAIndicator(df['close'], 26).ema_indicator()
+# RSI
+df['RSI'] = ta.momentum.RSIIndicator(df['close'], window=14).rsi()
 
-    macd = MACD(df['close'])
-    df['macd_diff'] = macd.macd_diff()
+# MACD
+macd = ta.trend.MACD(df['close'])
+df['MACD'] = macd.macd()
+df['MACD_signal'] = macd.macd_signal()
+df['MACD_histograma'] = macd.macd_diff()
 
-    bb = BollingerBands(df['close'])
-    df['bb_pos'] = (df['close'] - bb.bollinger_lband()) / (bb.bollinger_hband() - bb.bollinger_lband())
+# Bandas de Bollinger
+bb = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
+df['bb_upper'] = bb.bollinger_hband()
+df['bb_lower'] = bb.bollinger_lband()
+df['bb_middle'] = bb.bollinger_mavg()
 
-    if 'macd_diff' not in df.columns or df['macd_diff'].isnull().all():
-        raise ValueError("Erro: `macd_diff` não foi calculado corretamente.")
+# Volume médio
+df['volume_ma'] = df['volume'].rolling(window=20).mean()
 
-    return df
+# Remover linhas com NaN (início das médias móveis)
+df.dropna(inplace=True)
+
+# Salvar com indicadores
+df.to_csv("BTCUSDT_1min_com_indicadores.csv", index=False)
+
+print("✅ Indicadores calculados e ficheiro guardado como BTCUSDT_1min_com_indicadores.csv")
