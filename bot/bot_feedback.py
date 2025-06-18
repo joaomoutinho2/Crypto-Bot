@@ -9,6 +9,8 @@ from utils.telegram_alert import enviar_telegram
 exchange = ccxt.kucoin()
 
 def verificar_posicoes():
+    """Percorre posições abertas e fecha quando stop ou alvo são atingidos."""
+
     posicoes = carregar_posicoes_abertas()
 
     for data in posicoes:

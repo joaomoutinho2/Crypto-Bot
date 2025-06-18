@@ -28,10 +28,19 @@ Crypto-Bot/
 └── .env                   # Credenciais sensíveis
 ```
 
+Cada pasta possui uma responsabilidade clara:
+- **analise_tecnica** – implementação dos indicadores de mercado.
+- **analise_fundamental** – obtém contexto externo e usa o GPT.
+- **cerebro** – módulo de decisão e aprendizagem do bot.
+- **dados** – persistência no Firestore e modelos de ML.
+- **bot** – scripts que executam entradas e feedback de lucro.
+- **painel** – dashboard Streamlit para acompanhamento em tempo real.
+- **utils** – funções auxiliares e formatação em geral.
+
 ## 🔧 Como Correr Localmente
 1. Clona o projeto:
 ```bash
-git clone https://github.com/teu_repositorio/crypto-bot.git
+git clone https://github.com/seu_usuario/Crypto-Bot.git
 cd Crypto-Bot
 ```
 
@@ -70,6 +79,22 @@ python main.py
 streamlit run painel/painel.py
 ```
 
+Ao rodar `main.py`, o bot analisa cerca de 30 mercados e registra as entradas
+que satisfazem os filtros. Com `streamlit run painel/painel.py` é possível
+acompanhar em tempo real as posições abertas, fechamentos e saldo virtual.
+
+## 🔌 Tecnologias e Credenciais
+O projeto utiliza alguns serviços externos:
+- **OpenAI API** para análise textual;
+- **Firebase Firestore** para persistir estado e modelos;
+- **KuCoin via CCXT** para obter dados de mercado.
+
+Para executar é necessário definir `OPENAI_API_KEY` e `FIREBASE_JSON` no
+arquivo `.env`. O JSON do Firebase pode ser gerado seguindo a documentação
+[Creating a service account](https://firebase.google.com/docs/admin/setup).
+As coleções `saldo_virtual`, `historico_saldo` e `posicoes` são criadas
+automaticamente na primeira execução.
+
 ## ☁️ Uso no Render
 - Cria dois serviços:
   - `bot_entrada` com `main.py`
@@ -78,8 +103,8 @@ streamlit run painel/painel.py
 
 ## 📈 Funcionalidades Futuras
 - Scraping real de notícias (CoinTelegraph, Twitter, etc.)
-- Uso ativo do modelo RandomForest na decisão
+- Uso ativo do modelo RandomForest na decisão (parcialmente implementado)
 - Feedback do utilizador via Telegram ou painel
 
 ---
-Desenvolvido com ❤️ por [o teu nome/organização].
+Desenvolvido com ❤️ por [Seu nome ou organização].

@@ -9,6 +9,10 @@ def calcular_montante(df, resultado_ml, decisao_gpt, saldo_virtual):
     confianca_maxima = 0.25  # 25%
     confianca = confianca_base
 
+    # Ajusta "confianca" (% do saldo a arriscar) baseado nos sinais
+    # Quanto melhores os indicadores, maior a parcela liberada para a entrada
+    # Exemplo: RSI muito baixo sugere sobrevenda e aumenta a confiança
+    #          MACD positivo reforça tendência de alta, etc.
     # RSI e MACD
     rsi = df["rsi"].iloc[-1]
     macd = df["macd"].iloc[-1]
