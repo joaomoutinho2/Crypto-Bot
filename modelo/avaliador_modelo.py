@@ -16,7 +16,7 @@ def prever_subida(df_indicadores):
     docs = (
         colecao.order_by("timestamp", direction=firestore.Query.DESCENDING)
         .limit(1)
-        .stream(retry=None)
+        .stream()
     )
 
     modelo = None

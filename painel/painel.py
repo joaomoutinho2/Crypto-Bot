@@ -15,7 +15,7 @@ st.metric("Saldo Virtual", f"{saldo:.2f} USDT")
 docs = (
     db.collection("posicoes")
     .order_by("timestamp_entrada", direction=firestore.Query.DESCENDING)
-    .stream(retry=None)
+    .stream()
 )
 
 dados = []
@@ -55,7 +55,7 @@ st.dataframe(df_fechadas.style.format({
 }))
 
 # Gráfico de saldo ao longo do tempo
-docs_saldo = db.collection("historico_saldo").order_by("data").stream(retry=None)
+docs_saldo = db.collection("historico_saldo").order_by("data").stream()
 dados_grafico = []
 
 for doc in docs_saldo:

@@ -7,7 +7,7 @@ import io
 from google.cloud import firestore
 
 def treinar_modelo():
-    docs = db.collection("previsoes").where("avaliado", "==", True).stream(retry=None)
+    docs = db.collection("previsoes").where("avaliado", "==", True).stream()
     dados = []
     for doc in docs:
         d = doc.to_dict()
@@ -38,8 +38,7 @@ def treinar_modelo():
             "timestamp": firestore.SERVER_TIMESTAMP,
             "modelo_serializado": modelo_bytes,
             "acuracia_aparente": modelo.score(X, y),
-        },
-        retry=None,
+        }
     )
 
     print("✅ Modelo treinado e guardado com sucesso.")

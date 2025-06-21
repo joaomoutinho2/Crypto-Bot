@@ -7,7 +7,7 @@ db = firestore.client()
 
 def avaliar_saida():
     colecao_posicoes = db.collection("posicoes")
-    documentos = colecao_posicoes.stream(retry=None)
+    documentos = colecao_posicoes.stream()
 
     for doc in documentos:
         posicao = doc.to_dict()
@@ -25,7 +25,7 @@ def avaliar_saida():
         # Atualizar o pico se o preço atual for o maior até agora
         if preco_atual > preco_maximo:
             db.collection("posicoes").document(doc.id).update(
-                {"preco_maximo_alcancado": preco_atual}, retry=None
+                {"preco_maximo_alcancado": preco_atual}
             )
             preco_maximo = preco_atual
 
@@ -64,12 +64,11 @@ def avaliar_saida():
                     "lucro_prejuizo": lucro_valor,
                     "motivo": motivo_saida,
                     "timestamp": datetime.utcnow(),
-                },
-                retry=None,
+                }
             )
 
             # Eliminar posição
-            db.collection("posicoes").document(doc.id).delete(retry=None)
+            db.collection("posicoes").document(doc.id).delete()
 
             # Enviar alerta para o Telegram
             mensagem = (

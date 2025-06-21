@@ -23,7 +23,7 @@ def carregar_dados(usar_csv=False):
         docs = (
             db.collection("posicoes")
             .where("em_aberto", "==", False)
-            .stream(retry=None)
+            .stream()
         )
         dados = []
         for doc in docs:
@@ -66,8 +66,7 @@ def treinar(df, usar_csv=False):
                 "timestamp": datetime.utcnow(),
                 "modelo": modelo_base64,
                 "acc": acc,
-            },
-            retry=None,
+            }
         )
         print("📤 Modelo enviado para Firestore.")
     else:
