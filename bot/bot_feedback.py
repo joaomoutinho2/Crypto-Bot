@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import ccxt
 import pandas as pd
 from firebase_config import db
@@ -5,11 +9,12 @@ from dados.gestor_posicoes import carregar_posicoes_abertas, fechar_posicao
 from utils.dados_market import obter_df_ativo  
 from dados.gestor_saldo import carregar_saldo
 from utils.telegram_alert import enviar_telegram
+from estrategia.avaliar_saida import avaliar_saida
 
 exchange = ccxt.kucoin()
 
 def verificar_posicoes():
-    """Percorre posições abertas e fecha quando stop ou alvo são atingidos."""
+    """Percorre posições abertas e fecha quando stop, alvo ou condições técnicas são atingidos."""
 
     posicoes = carregar_posicoes_abertas()
 
@@ -52,6 +57,12 @@ def verificar_posicoes():
         except Exception as e:
             print(f"❌ Erro ao verificar posição {simbolo}: {e}")
 
+    # 🧠 Após verificar stop e alvo, verificar saídas por trailing/técnica
+    print("🔍 A verificar saídas com trailing stop e lógica técnica...")
+    try:
+        avaliar_saida()
+    except Exception as e:
+        print(f"⚠️ Erro ao executar avaliar_saida: {e}")
 
 if __name__ == "__main__":
     verificar_posicoes()

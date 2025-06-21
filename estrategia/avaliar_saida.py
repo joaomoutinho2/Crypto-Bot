@@ -1,5 +1,6 @@
 from firebase_admin import firestore
 from utils.dados_market import obter_df_ativo as get_historico_1min
+from utils.telegram_alert import enviar_telegram
 from datetime import datetime
 
 db = firestore.client()
@@ -51,13 +52,27 @@ def avaliar_saida():
         if motivo_saida:
             print(f"[SAÍDA] {simbolo}: {motivo_saida} | Entrada: {preco_entrada:.2f} | Atual: {preco_atual:.2f}")
 
+            lucro_valor = preco_atual - preco_entrada
+            lucro_percent = (lucro_valor / preco_entrada) * 100
+
+            # Registar no histórico de vendas
             db.collection("historico_vendas").add({
                 "simbolo": simbolo,
                 "preco_entrada": preco_entrada,
                 "preco_saida": preco_atual,
-                "lucro_prejuizo": preco_atual - preco_entrada,
+                "lucro_prejuizo": lucro_valor,
                 "motivo": motivo_saida,
                 "timestamp": datetime.utcnow()
             })
 
+            # Eliminar posição
             db.collection("posicoes").document(doc.id).delete()
+
+            # Enviar alerta para o Telegram
+            mensagem = (
+                f"⚠️ *{motivo_saida}*\n"
+                f"📉 *Saída de* `{simbolo}`\n"
+                f"💰 Entrada: `{preco_entrada:.4f}` → Saída: `{preco_atual:.4f}`\n"
+                f"📊 Resultado: *{lucro_valor:.2f} USDT* ({lucro_percent:.2f}%)"
+            )
+            enviar_telegram(mensagem)
