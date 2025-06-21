@@ -64,6 +64,12 @@ python modelo/treino_modelo.py
 O arquivo `modelo_rf.pkl` será criado localmente (e está ignorado pelo Git) e
 enviado para o Firestore, de onde o bot o irá buscar automaticamente.
 
+As previsões em tempo real são feitas através da função
+`prever_subida(df_indicadores)` disponível em `modelo/avaliador_modelo.py`.
+Para re-treinar o modelo de forma contínua podes executar
+`modelo/treino_continuo.py` manualmente ou agendar a função `executar_treino()`
+num cron job.
+
 4. (Opcional) Gere indicadores técnicos com o dataset `BTCUSDT_1min.csv`:
 ```bash
 python analise_tecnica/indicadores.py

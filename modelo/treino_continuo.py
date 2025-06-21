@@ -33,13 +33,24 @@ def treinar(df):
 
     joblib.dump(modelo, "modelo_treinado.pkl")
 
-    enviar_telegram(f"🧠 Modelo re-treinado!\n🎯 Acurácia: *{acc*100:.2f}%* com {len(df)} registos.")
+    enviar_telegram(
+        f"🧠 Modelo re-treinado!\n🎯 Acurácia: *{acc*100:.2f}%* com {len(df)} registos."
+    )
     print("✅ Modelo treinado e guardado.")
     return acc
 
-if __name__ == "__main__":
+
+def executar_treino():
+    """Carrega os dados do Firestore e treina o modelo.
+
+    Pode ser chamado manualmente ou por cron jobs e retorna a acurácia
+    obtida ou ``None`` caso não haja dados suficientes.
+    """
     df = carregar_dados()
     if df.empty:
         print("⚠️ Sem dados para treino.")
-    else:
-        treinar(df)
+        return None
+    return treinar(df)
+
+if __name__ == "__main__":
+    executar_treino()
