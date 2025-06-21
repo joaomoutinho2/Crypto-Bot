@@ -16,7 +16,6 @@ def carregar_saldo():
         return valor_inicial
     return data.get("valor", 1000.0)
 
-
 def guardar_saldo(novo_valor):
     # Atualiza saldo atual
     db.collection("saldo_virtual").document("principal").set(

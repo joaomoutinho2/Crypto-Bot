@@ -15,8 +15,7 @@ def registar_entrada(simbolo, preco_entrada, contexto, decisao, montante, stop_l
             "montante": montante,
             "stop_loss": stop_loss,
             "take_profit": take_profit,
-        },
-        retry=None,
+        }, retry=None
     )
 
 def carregar_posicoes_abertas():
@@ -42,8 +41,7 @@ def fechar_posicao(doc_id, preco_saida):
                 "lucro_percentual": round(lucro_percentual * 100, 2),
                 "lucro_valor": round(lucro_valor, 2),
                 "em_aberto": False,
-            },
-            retry=None,
+            }, retry=None
         )
 
         # Atualizar saldo

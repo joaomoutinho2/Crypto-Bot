@@ -64,8 +64,7 @@ def avaliar_saida():
                     "lucro_prejuizo": lucro_valor,
                     "motivo": motivo_saida,
                     "timestamp": datetime.utcnow(),
-                },
-                retry=None,
+                }, retry=None
             )
 
             # Eliminar posição

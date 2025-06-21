@@ -67,7 +67,7 @@ def treinar(df, usar_csv=False):
                 "modelo": modelo_base64,
                 "acc": acc,
             },
-            retry=None,
+            retry=None
         )
         print("📤 Modelo enviado para Firestore.")
     else:

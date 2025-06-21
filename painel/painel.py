@@ -11,7 +11,7 @@ st.title("💹 Painel de Controlo do Crypto-Bot")
 saldo = carregar_saldo()
 st.metric("Saldo Virtual", f"{saldo:.2f} USDT")
 
-# Consulta todas posições (abertas e fechadas) para exibir no dashboard
+# Consulta todas posições (abertas e fechadas)
 docs = (
     db.collection("posicoes")
     .order_by("timestamp_entrada", direction=firestore.Query.DESCENDING)
