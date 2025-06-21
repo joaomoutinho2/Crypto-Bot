@@ -20,6 +20,15 @@ def obter_df_ativo(simbolo):
     df['macd_signal'] = macd.macd_signal()
     df['macd_diff'] = macd.macd_diff()
 
+    # Bandas de Bollinger
+    bb = ta.volatility.BollingerBands(close=df['close'], window=20, window_dev=2)
+    df['bb_upper'] = bb.bollinger_hband()
+    df['bb_lower'] = bb.bollinger_lband()
+    df['bb_middle'] = bb.bollinger_mavg()
+
+    # Média móvel do volume
+    df['volume_ma'] = df['volume'].rolling(window=20).mean()
+
     # Limpar NaNs iniciais
     df = df.dropna()
 
