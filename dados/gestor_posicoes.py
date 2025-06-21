@@ -4,17 +4,19 @@ from dados.gestor_saldo import carregar_saldo, guardar_saldo
 
 def registar_entrada(simbolo, preco_entrada, contexto, decisao, montante, stop_loss, take_profit):
     doc_ref = db.collection("posicoes").document()
-    doc_ref.set({
-        "simbolo": simbolo,
-        "preco_entrada": preco_entrada,
-        "contexto": contexto,
-        "decisao": decisao,
-        "timestamp_entrada": datetime.utcnow(),
-        "em_aberto": True,
-        "montante": montante,
-        "stop_loss": stop_loss,
-        "take_profit": take_profit
-    })
+    doc_ref.set(
+        {
+            "simbolo": simbolo,
+            "preco_entrada": preco_entrada,
+            "contexto": contexto,
+            "decisao": decisao,
+            "timestamp_entrada": datetime.utcnow(),
+            "em_aberto": True,
+            "montante": montante,
+            "stop_loss": stop_loss,
+            "take_profit": take_profit,
+        },
+    )
 
 def carregar_posicoes_abertas():
     docs = db.collection("posicoes").where("em_aberto", "==", True).stream()
@@ -32,13 +34,15 @@ def fechar_posicao(doc_id, preco_saida):
         lucro_percentual = (preco_saida - preco_entrada) / preco_entrada
         lucro_valor = montante * lucro_percentual
 
-        doc_ref.update({
-            "preco_saida": preco_saida,
-            "timestamp_saida": datetime.utcnow(),
-            "lucro_percentual": round(lucro_percentual * 100, 2),
-            "lucro_valor": round(lucro_valor, 2),
-            "em_aberto": False
-        })
+        doc_ref.update(
+            {
+                "preco_saida": preco_saida,
+                "timestamp_saida": datetime.utcnow(),
+                "lucro_percentual": round(lucro_percentual * 100, 2),
+                "lucro_valor": round(lucro_valor, 2),
+                "em_aberto": False,
+            },
+        )
 
         # Atualizar saldo
         saldo = carregar_saldo()

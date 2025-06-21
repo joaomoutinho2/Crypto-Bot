@@ -33,10 +33,12 @@ def treinar_modelo():
     joblib.dump(modelo, buffer)
     modelo_bytes = base64.b64encode(buffer.getvalue()).decode()
 
-    db.collection("modelos_treinados").add({
-        "timestamp": firestore.SERVER_TIMESTAMP,
-        "modelo_serializado": modelo_bytes,
-        "acuracia_aparente": modelo.score(X, y)
-    })
+    db.collection("modelos_treinados").add(
+        {
+            "timestamp": firestore.SERVER_TIMESTAMP,
+            "modelo_serializado": modelo_bytes,
+            "acuracia_aparente": modelo.score(X, y),
+        }
+    )
 
     print("✅ Modelo treinado e guardado com sucesso.")

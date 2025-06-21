@@ -10,19 +10,20 @@ def carregar_saldo():
     if not data:
         # Inicializa com saldo padrão
         valor_inicial = 1000.0
-        db.collection("saldo_virtual").document("principal").set({"valor": valor_inicial})
+        db.collection("saldo_virtual").document("principal").set(
+            {"valor": valor_inicial}
+        )
         return valor_inicial
     return data.get("valor", 1000.0)
 
 
 def guardar_saldo(novo_valor):
     # Atualiza saldo atual
-    db.collection("saldo_virtual").document("principal").set({
-        "valor": novo_valor
-    })
+    db.collection("saldo_virtual").document("principal").set(
+        {"valor": novo_valor}
+    )
 
     # Guarda histórico
-    db.collection("historico_saldo").add({
-        "saldo": novo_valor,
-        "data": datetime.utcnow()
-    })
+    db.collection("historico_saldo").add(
+        {"saldo": novo_valor, "data": datetime.utcnow()}
+    )

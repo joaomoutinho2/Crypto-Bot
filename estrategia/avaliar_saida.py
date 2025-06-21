@@ -24,9 +24,9 @@ def avaliar_saida():
 
         # Atualizar o pico se o preço atual for o maior até agora
         if preco_atual > preco_maximo:
-            db.collection("posicoes").document(doc.id).update({
-                "preco_maximo_alcancado": preco_atual
-            })
+            db.collection("posicoes").document(doc.id).update(
+                {"preco_maximo_alcancado": preco_atual}
+            )
             preco_maximo = preco_atual
 
         motivo_saida = None
@@ -56,14 +56,16 @@ def avaliar_saida():
             lucro_percent = (lucro_valor / preco_entrada) * 100
 
             # Registar no histórico de vendas
-            db.collection("historico_vendas").add({
-                "simbolo": simbolo,
-                "preco_entrada": preco_entrada,
-                "preco_saida": preco_atual,
-                "lucro_prejuizo": lucro_valor,
-                "motivo": motivo_saida,
-                "timestamp": datetime.utcnow()
-            })
+            db.collection("historico_vendas").add(
+                {
+                    "simbolo": simbolo,
+                    "preco_entrada": preco_entrada,
+                    "preco_saida": preco_atual,
+                    "lucro_prejuizo": lucro_valor,
+                    "motivo": motivo_saida,
+                    "timestamp": datetime.utcnow(),
+                }
+            )
 
             # Eliminar posição
             db.collection("posicoes").document(doc.id).delete()
