@@ -20,7 +20,11 @@ def carregar_dados(usar_csv=False):
         df["target"] = df["target"].astype(int)
         return df
     else:
-        docs = db.collection("posicoes").where("em_aberto", "==", False).stream()
+        docs = (
+            db.collection("posicoes")
+            .where("em_aberto", "==", False)
+            .stream(retry=None)
+        )
         dados = []
         for doc in docs:
             d = doc.to_dict()
@@ -57,11 +61,14 @@ def treinar(df, usar_csv=False):
     if usar_csv:
         modelo_serializado = joblib.dumps(modelo)
         modelo_base64 = base64.b64encode(modelo_serializado).decode('utf-8')
-        db.collection("modelos_treinados").add({
-            "timestamp": datetime.utcnow(),
-            "modelo": modelo_base64,
-            "acc": acc
-        })
+        db.collection("modelos_treinados").add(
+            {
+                "timestamp": datetime.utcnow(),
+                "modelo": modelo_base64,
+                "acc": acc,
+            },
+            retry=None,
+        )
         print("📤 Modelo enviado para Firestore.")
     else:
         joblib.dump(modelo, "modelo_treinado.pkl")

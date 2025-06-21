@@ -12,7 +12,11 @@ saldo = carregar_saldo()
 st.metric("Saldo Virtual", f"{saldo:.2f} USDT")
 
 # Consulta todas posições (abertas e fechadas) para exibir no dashboard
-docs = db.collection("posicoes").order_by("timestamp_entrada", direction=firestore.Query.DESCENDING).stream()
+docs = (
+    db.collection("posicoes")
+    .order_by("timestamp_entrada", direction=firestore.Query.DESCENDING)
+    .stream(retry=None)
+)
 
 dados = []
 for doc in docs:
@@ -51,7 +55,7 @@ st.dataframe(df_fechadas.style.format({
 }))
 
 # Gráfico de saldo ao longo do tempo
-docs_saldo = db.collection("historico_saldo").order_by("data").stream()
+docs_saldo = db.collection("historico_saldo").order_by("data").stream(retry=None)
 dados_grafico = []
 
 for doc in docs_saldo:
