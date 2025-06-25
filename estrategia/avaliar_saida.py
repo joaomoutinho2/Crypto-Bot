@@ -6,7 +6,7 @@ from datetime import datetime
 db = firestore.client()
 
 def avaliar_saida():
-    colecao_posicoes = db.collection("posicoes")
+    colecao_posicoes = db.collection("posicoes").where("em_aberto", "==", True)
     documentos = colecao_posicoes.stream(retry=None)
 
     for doc in documentos:
