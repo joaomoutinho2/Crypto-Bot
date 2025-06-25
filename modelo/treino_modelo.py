@@ -76,11 +76,12 @@ def treinar(df, usar_csv=False):
         )
     else:
         joblib.dump(modelo, "modelo_treinado.pkl")
-        enviar_telegram(f"🧠 *Modelo re-treinado com sucesso!*
-
-🎯 Acurácia: *{acc*100:.2f}%*
-📊 Registos: *{n_amostras}*
-🕒 Hora: {agora}")
+        enviar_telegram(
+            f"""🧠 *Modelo re-treinado com sucesso!*\n
+    🎯 *Acurácia:* {acc*100:.2f}%\n
+    📊 *Registos:* {n_amostras}\n
+    🕒 *Hora:* {agora}"""
+        )")
 
     # Guardar histórico no Firestore
     db.collection("registo_treinos").add(
