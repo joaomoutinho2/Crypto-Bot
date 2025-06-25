@@ -112,3 +112,6 @@ def correr_analise():
 
         except Exception as e:
             print(f"❌ Erro ao analisar {simbolo}: {e}")
+            import traceback
+            print("❌ Erro em entrada:", e)
+            traceback.print_exc()
