@@ -33,22 +33,22 @@ def correr_analise():
     saldo_virtual = carregar_saldo()
 
     # Carregar modelo do Firebase Storage
-modelos = db.collection("modelos_treinados").order_by("timestamp", direction="DESCENDING").limit(1).stream()
-modelo_ml = None
-for doc in modelos:
-    url = doc.to_dict().get("url_download")
-    if url:
-        response = requests.get(url)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as tmp:
-            tmp.write(response.content)
-            modelo_ml = joblib.load(tmp.name)
-        print("✅ Modelo ML carregado do Firebase Storage")
-        break
-else:
-    print("⚠️ Nenhum modelo disponível no Firestore.")
-    return
+    modelos = db.collection("modelos_treinados").order_by("timestamp", direction="DESCENDING").limit(1).stream()
+    modelo_ml = None
+    for doc in modelos:
+        url = doc.to_dict().get("url_download")
+        if url:
+            response = requests.get(url)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as tmp:
+                tmp.write(response.content)
+                modelo_ml = joblib.load(tmp.name)
+            print("✅ Modelo ML carregado do Firebase Storage")
+            break
+    else:
+        print("⚠️ Nenhum modelo disponível no Firestore.")
+        return  # <-- agora está dentro da função
 
-for simbolo in simbolos[:30]:
+    for simbolo in simbolos[:30]:
         try:
             df = obter_df_ativo(simbolo)  # Use a função que calcula os indicadores técnicos
 
