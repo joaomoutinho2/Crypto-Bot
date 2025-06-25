@@ -2,7 +2,7 @@ import os
 import json
 from dotenv import load_dotenv
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, storage
 
 load_dotenv()
 
@@ -17,7 +17,9 @@ def iniciar_firebase():
     cred_dict = json.loads(cred_json)
     cred_dict["private_key"] = cred_dict["private_key"].replace("\\n", "\n")
     cred = credentials.Certificate(cred_dict)
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(cred, {
+        "storageBucket": "gs://crypto-bot-fe9d7.firebasestorage.app"
+    })
 
 # Inicializa e cria db global
 iniciar_firebase()
