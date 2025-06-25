@@ -23,7 +23,7 @@ Crypto-Bot/
 ├── painel/                # Streamlit com saldo e decisões
 ├── utils/                 # Helpers e formatação
 ├── firebase_config.py     # Inicia Firebase
-├── main.py                # Ponto de entrada do bot
+├── scripts/               # Automatiza execuções em loop
 ├── requirements.txt       # Bibliotecas
 └── .env                   # Credenciais sensíveis
 ```
@@ -75,9 +75,15 @@ num cron job.
 python analise_tecnica/indicadores.py
 ```
 
-5. Corre o bot principal:
+5. Corre o bot em modo contínuo:
 ```bash
-python main.py
+python scripts/loop_bot.py
+```
+
+Caso prefiras executar apenas uma parte, podes usar:
+```bash
+python bot/bot_entrada.py      # procura novas oportunidades
+python bot/bot_feedback.py     # fecha posições abertas
 ```
 
 6. Para ver o painel:
@@ -85,7 +91,7 @@ python main.py
 streamlit run painel/painel.py
 ```
 
-Ao rodar `main.py`, o bot analisa cerca de 30 mercados e registra as entradas
+A execução do `loop_bot.py` analisa cerca de 30 mercados e registra as entradas
 que satisfazem os filtros. Com `streamlit run painel/painel.py` é possível
 acompanhar em tempo real as posições abertas, fechamentos e saldo virtual.
 
@@ -96,15 +102,16 @@ O projeto utiliza alguns serviços externos:
 - **KuCoin via CCXT** para obter dados de mercado.
 
 Para executar é necessário definir `OPENAI_API_KEY` e `FIREBASE_JSON` no
-arquivo `.env`. O JSON do Firebase pode ser gerado seguindo a documentação
+arquivo `.env`. Também são usados `TELEGRAM_TOKEN` e `TELEGRAM_CHAT_ID` para
+enviar alertas. O JSON do Firebase pode ser gerado seguindo a documentação
 [Creating a service account](https://firebase.google.com/docs/admin/setup).
 As coleções `saldo_virtual`, `historico_saldo` e `posicoes` são criadas
 automaticamente na primeira execução.
 
 ## ☁️ Uso no Render
 - Cria dois serviços:
-  - `bot_entrada` com `main.py`
-  - `bot_feedback` com `bot/bot_feedback.py` (cron: cada hora ou 2h)
+  - `bot_entrada` com `bot/bot_entrada.py`
+  - `bot_feedback` com `bot/bot_feedback.py` (cron: cada 15 min)
 - Coloca as variáveis de ambiente `.env` no Render
 
 ## 📈 Funcionalidades Futuras
