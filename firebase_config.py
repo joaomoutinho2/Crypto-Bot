@@ -18,7 +18,7 @@ def iniciar_firebase():
     cred_dict["private_key"] = cred_dict["private_key"].replace("\\n", "\n")
     cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred, {
-        "storageBucket": "gs://crypto-bot-fe9d7.firebasestorage.app"
+        "storageBucket": "crypto-bot-fe9d7.firebasestorage.app"
     })
 
 # Inicializa e cria db global
