@@ -11,7 +11,7 @@ from utils.telegram_alert import enviar_telegram
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from datetime import datetime
+from datetime import datetime, timezone
 
 def carregar_dados(usar_csv=False):
     if usar_csv:
@@ -80,12 +80,12 @@ def treinar(df, usar_csv=False):
 
     # Upload para Firebase Storage
     bucket = storage.bucket()
-    blob = bucket.blob(f"modelos/modelo_treinado_{datetime.utcnow().isoformat()}.pkl")
+    blob = bucket.blob(f"modelos/modelo_treinado_{datetime.now(timezone.utc).isoformat()}.pkl")
     blob.upload_from_filename("modelo_treinado.pkl")
     url_download = blob.generate_signed_url(expiration=3600 * 24 * 7)  # válido por 7 dias
 
     db.collection("modelos_treinados").add({
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "url_download": url_download,
         "acc": acc
     }, retry=None)
@@ -100,7 +100,7 @@ def treinar(df, usar_csv=False):
     # Guardar histórico no Firestore
     db.collection("registo_treinos").add(
         {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "modelo": "RandomForest",
             "acc": acc,
             "n_amostras": n_amostras
