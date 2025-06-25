@@ -81,7 +81,7 @@ def treinar(df, usar_csv=False):
     🎯 *Acurácia:* {acc*100:.2f}%\n
     📊 *Registos:* {n_amostras}\n
     🕒 *Hora:* {agora}"""
-        )")
+        )
 
     # Guardar histórico no Firestore
     db.collection("registo_treinos").add(
