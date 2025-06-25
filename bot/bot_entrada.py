@@ -20,6 +20,7 @@ import tempfile
 from firebase_admin import storage
 import os
 import pickle
+import platform
 
 
 def carregar_modelo_mais_recente():
@@ -34,11 +35,17 @@ def carregar_modelo_mais_recente():
     blobs.sort(key=lambda x: x.name, reverse=True)
     blob_mais_recente = blobs[0]
 
-    caminho_local = "/tmp/modelo_treinado.pkl"
+    # Usar /tmp no Render, usar ./modelos/ localmente
+    if platform.system() == "Windows":
+        caminho_local = os.path.join("modelos", "modelo_treinado.pkl")
+    else:
+        caminho_local = "/tmp/modelo_treinado.pkl"
+
+    os.makedirs(os.path.dirname(caminho_local), exist_ok=True)
     blob_mais_recente.download_to_filename(caminho_local)
 
     with open(caminho_local, "rb") as f:
-        modelo = pickle.load(f)
+        modelo = joblib.load(f)
 
     print(f"✅ Modelo carregado: {blob_mais_recente.name}")
     return modelo
