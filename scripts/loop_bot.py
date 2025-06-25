@@ -1,7 +1,8 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from firebase_config import iniciar_firebase
-
-iniciar_firebase()
-
 from bot.bot_entrada import correr_analise as entrada
 from bot.bot_feedback import verificar_posicoes as feedback
 import schedule
