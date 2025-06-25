@@ -14,6 +14,10 @@ from utils.dados_market import obter_df_ativo
 from dados.gestor_posicoes import registar_entrada
 from dados.gestor_saldo import carregar_saldo, guardar_saldo
 from modelo.avaliador_modelo import prever_subida
+import requests
+import joblib
+import tempfile
+
 
 def correr_analise():
     """Percorre os principais mercados avaliando possíveis entradas.
@@ -28,7 +32,23 @@ def correr_analise():
     simbolos = [s for s in exchange.load_markets().keys() if "/USDT" in s]
     saldo_virtual = carregar_saldo()
 
-    for simbolo in simbolos[:30]:
+    # Carregar modelo do Firebase Storage
+modelos = db.collection("modelos_treinados").order_by("timestamp", direction="DESCENDING").limit(1).stream()
+modelo_ml = None
+for doc in modelos:
+    url = doc.to_dict().get("url_download")
+    if url:
+        response = requests.get(url)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as tmp:
+            tmp.write(response.content)
+            modelo_ml = joblib.load(tmp.name)
+        print("✅ Modelo ML carregado do Firebase Storage")
+        break
+else:
+    print("⚠️ Nenhum modelo disponível no Firestore.")
+    return
+
+for simbolo in simbolos[:30]:
         try:
             df = obter_df_ativo(simbolo)  # Use a função que calcula os indicadores técnicos
 

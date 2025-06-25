@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pandas as pd
 import joblib
 import base64
+from firebase_admin import storage
 from firebase_config import db
 from utils.telegram_alert import enviar_telegram
 from sklearn.ensemble import RandomForestClassifier
@@ -76,11 +77,24 @@ def treinar(df, usar_csv=False):
         )
     else:
         joblib.dump(modelo, "modelo_treinado.pkl")
+
+    # Upload para Firebase Storage
+    bucket = storage.bucket()
+    blob = bucket.blob(f"modelos/modelo_treinado_{datetime.utcnow().isoformat()}.pkl")
+    blob.upload_from_filename("modelo_treinado.pkl")
+    url_download = blob.generate_signed_url(expiration=3600 * 24 * 7)  # válido por 7 dias
+
+    db.collection("modelos_treinados").add({
+        "timestamp": datetime.utcnow(),
+        "url_download": url_download,
+        "acc": acc
+    }, retry=None)
+
         enviar_telegram(
             f"""🧠 *Modelo re-treinado com sucesso!*\n
-    🎯 *Acurácia:* {acc*100:.2f}%\n
-    📊 *Registos:* {n_amostras}\n
-    🕒 *Hora:* {agora}"""
+🎯 *Acurácia:* {acc*100:.2f}%\n
+📊 *Registos:* {n_amostras}\n
+🕒 *Hora:* {agora}"""
         )
 
     # Guardar histórico no Firestore
