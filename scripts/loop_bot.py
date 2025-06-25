@@ -1,27 +1,28 @@
 import sys
 import os
+import time
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from firebase_config import iniciar_firebase
 from bot.bot_entrada import correr_analise as entrada
 from bot.bot_feedback import verificar_posicoes as feedback
-import schedule
-import time
 
+print("✅ Bot em modo contínuo iniciado sem agendamento.")
 
-def tarefa_entrada():
-    print("⏳ A correr bot de entrada...")
-    entrada()
+# Inicializar Firebase
+iniciar_firebase()
 
-def tarefa_feedback():
-    print("🔁 A correr bot de feedback...")
-    feedback()
-
-# Agendamentos
-schedule.every(10).minutes.do(tarefa_entrada)
-schedule.every(5).minutes.do(tarefa_feedback)
-
-print("✅ Bot em modo contínuo iniciado.")
 while True:
-    schedule.run_pending()
-    time.sleep(1)
+    try:
+        print("⏳ A correr bot de entrada...")
+        entrada()
+    except Exception as e:
+        print(f"❌ Erro em entrada: {e}")
+
+    try:
+        print("🔁 A correr bot de feedback...")
+        feedback()
+    except Exception as e:
+        print(f"❌ Erro em feedback: {e}")
+
+    time.sleep(10)  # Espera de 10 segundos entre iterações

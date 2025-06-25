@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pandas as pd
 import joblib
 import base64
@@ -56,7 +60,8 @@ def treinar(df, usar_csv=False):
     modelo.fit(X_train, y_train)
 
     acc = accuracy_score(y_test, modelo.predict(X_test))
-    print(f"✅ Acurácia: {acc:.2%}")
+    n_amostras = len(df)
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
 
     if usar_csv:
         modelo_serializado = joblib.dumps(modelo)
@@ -69,21 +74,33 @@ def treinar(df, usar_csv=False):
             },
             retry=None
         )
-        print("📤 Modelo enviado para Firestore.")
     else:
         joblib.dump(modelo, "modelo_treinado.pkl")
-        enviar_telegram(f"🧠 Modelo re-treinado!\n🎯 Acurácia: *{acc*100:.2f}%* com {len(df)} registos.")
-        print("✅ Modelo guardado localmente.")
+        enviar_telegram(f"🧠 *Modelo re-treinado com sucesso!*
+
+🎯 Acurácia: *{acc*100:.2f}%*
+📊 Registos: *{n_amostras}*
+🕒 Hora: {agora}")
+
+    # Guardar histórico no Firestore
+    db.collection("registo_treinos").add(
+        {
+            "timestamp": datetime.utcnow(),
+            "modelo": "RandomForest",
+            "acc": acc,
+            "n_amostras": n_amostras
+        },
+        retry=None
+    )
 
     return acc
 
 def executar_treino(usar_csv=False):
     df = carregar_dados(usar_csv)
     if df.empty:
-        print("⚠️ Sem dados para treino.")
+        enviar_telegram("⚠️ Sem dados disponíveis para treinar o modelo.")
         return None
     return treinar(df, usar_csv)
 
 if __name__ == "__main__":
-    # Para correr em modo CSV (offline): executar_treino(usar_csv=True)
     executar_treino(usar_csv=False)
