@@ -17,6 +17,31 @@ from modelo.avaliador_modelo import prever_subida
 import requests
 import joblib
 import tempfile
+from firebase_admin import storage
+import os
+import pickle
+
+
+def carregar_modelo_mais_recente():
+    bucket = storage.bucket()
+    blobs = list(bucket.list_blobs(prefix='modelos/modelo_treinado'))
+
+    if not blobs:
+        print("⚠️ Nenhum modelo encontrado no Storage.")
+        return None
+
+    # Ordenar pelos nomes (timestamps) para apanhar o mais recente
+    blobs.sort(key=lambda x: x.name, reverse=True)
+    blob_mais_recente = blobs[0]
+
+    caminho_local = "/tmp/modelo_treinado.pkl"
+    blob_mais_recente.download_to_filename(caminho_local)
+
+    with open(caminho_local, "rb") as f:
+        modelo = pickle.load(f)
+
+    print(f"✅ Modelo carregado: {blob_mais_recente.name}")
+    return modelo
 
 
 def correr_analise():
@@ -32,21 +57,10 @@ def correr_analise():
     simbolos = [s for s in exchange.load_markets().keys() if "/USDT" in s]
     saldo_virtual = carregar_saldo()
 
-    # Carregar modelo do Firebase Storage
-    modelos = db.collection("modelos_treinados").order_by("timestamp", direction="DESCENDING").limit(1).stream()
-    modelo_ml = None
-    for doc in modelos:
-        url = doc.to_dict().get("url_download")
-        if url:
-            response = requests.get(url)
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as tmp:
-                tmp.write(response.content)
-                modelo_ml = joblib.load(tmp.name)
-            print("✅ Modelo ML carregado do Firebase Storage")
-            break
-    else:
-        print("⚠️ Nenhum modelo disponível no Firestore.")
-        return  # <-- agora está dentro da função
+    modelo_ml = carregar_modelo_mais_recente()
+    if modelo_ml is None:
+        print("⚠️ Modelo não encontrado. A decisão será feita sem ML.")
+        modelo_ml = lambda x: False  # Função que nunca confirma a entrada
 
     for simbolo in simbolos[:30]:
         try:
