@@ -90,12 +90,12 @@ def treinar(df, usar_csv=False):
         "acc": acc
     }, retry=None)
 
-        enviar_telegram(
-            f"""🧠 *Modelo re-treinado com sucesso!*\n
+    enviar_telegram(
+        f"""🧠 *Modelo re-treinado com sucesso!*\n
 🎯 *Acurácia:* {acc*100:.2f}%\n
 📊 *Registos:* {n_amostras}\n
 🕒 *Hora:* {agora}"""
-        )
+    )
 
     # Guardar histórico no Firestore
     db.collection("registo_treinos").add(
