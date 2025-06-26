@@ -51,6 +51,41 @@ def carregar_modelo_mais_recente():
     return modelo
 
 
+
+def avaliar_entrada_com_modelo(df, modelo_ml, simbolo):
+    try:
+        rsi = df['rsi'].iloc[-1]
+        macd_hist = df['macd_diff'].iloc[-1]
+        bb_upper = df['bb_upper'].iloc[-1]
+        bb_lower = df['bb_lower'].iloc[-1]
+        volume = df['volume'].iloc[-1]
+        volume_ma = df['volume_ma'].iloc[-1]
+        ema_9 = df['ema_9'].iloc[-1] if 'ema_9' in df.columns else 0
+        ema_21 = df['ema_21'].iloc[-1] if 'ema_21' in df.columns else 0
+
+        bollinger_width = bb_upper - bb_lower
+        ema_diff = ema_9 - ema_21
+        volume_ratio = volume / volume_ma if volume_ma != 0 else 0
+
+        features = [[rsi, macd_hist, bollinger_width, ema_diff, volume_ratio]]
+        prob_subida = modelo_ml.predict_proba(features)[0][1]
+
+        print(f"[{simbolo}] RSI: {rsi:.2f}, MACD: {macd_hist:.5f}, Bollinger Width: {bollinger_width:.5f}, EMA Diff: {ema_diff:.5f}, Volume Ratio: {volume_ratio:.2f}, Prob Subida: {prob_subida:.2f}")
+
+        if prob_subida >= 0.6:
+            return True
+
+        # fallback heurístico
+        if rsi < 30 and macd_hist > 0:
+            print(f"[{simbolo}] ⚠️ Entrada com base em heurística (RSI < 30 e MACD > 0)")
+            return True
+
+        print(f"[IGNORADO] {simbolo}: Probabilidade baixa ({prob_subida:.2f})")
+        return False
+    except Exception as e:
+        print(f"[ERRO] ao avaliar entrada com ML para {simbolo}: {e}")
+        return False
+
 def correr_analise():
     """Percorre os principais mercados avaliando possíveis entradas.
 
@@ -73,13 +108,22 @@ def correr_analise():
         try:
             df = obter_df_ativo(simbolo)  # Use a função que calcula os indicadores técnicos
 
-            # Verificar indicadores técnicos
-            rsi = df['rsi'].iloc[-1]
-            macd_hist = df['macd_diff'].iloc[-1]
-            preco = df['close'].iloc[-1]
-            bb_lower = df['bb_lower'].iloc[-1]
-            volume = df['volume'].iloc[-1]
-            volume_ma = df['volume_ma'].iloc[-1]
+            # Verificar se df está vazio ou sem colunas essenciais
+            colunas_necessarias = ['rsi', 'macd_diff', 'close', 'bb_lower', 'volume', 'volume_ma']
+            if df.empty or not all(col in df.columns for col in colunas_necessarias):
+                print(f"[SKIP] {simbolo}: DataFrame vazio ou colunas em falta.")
+                continue
+
+            try:
+                rsi = df['rsi'].iloc[-1]
+                macd_hist = df['macd_diff'].iloc[-1]
+                preco = df['close'].iloc[-1]
+                bb_lower = df['bb_lower'].iloc[-1]
+                volume = df['volume'].iloc[-1]
+                volume_ma = df['volume_ma'].iloc[-1]
+            except IndexError:
+                print(f"[SKIP] {simbolo}: Dados insuficientes para calcular indicadores.")
+                continue
 
             condicoes_tecnicas = [
                 rsi < 30,
